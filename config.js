@@ -7,7 +7,7 @@ window.CFG = {
   GOOGLE_WEB_CLIENT_ID: "701673972686-419fufdkmjhcfu3eol1e28roql3dc7h8.apps.googleusercontent.com",
 
   // Adresse publique de ta politique de confidentialité (voir docs/privacy.html)
-  PRIVACY_URL: "https://VOTRE-NOM.github.io/trace-et-roule/privacy.html",
+  PRIVACY_URL: "https://alex52k0-maker.github.io/trace-et-roule/privacy.html",
 
   ADS: {
     // true  = publicités de TEST Google (obligatoire pendant le développement)
