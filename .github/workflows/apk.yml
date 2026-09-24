@@ -20,7 +20,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      name: Installer les outils Android
+      - name: Installer les outils Android
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
