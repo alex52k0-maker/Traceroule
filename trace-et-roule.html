@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#161a33">
+<title>Trace & Roule</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --bg: #161a33;
+    --panel: #21274b;
+    --panel-2: #2c3462;
+    --text: #f4f5fb;
+    --muted: #9aa3d0;
+    --ink: #ffd166;
+    --ball: #f4f5fb;
+    --goal: #06d6a0;
+    --danger: #ef476f;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: "Avenir Next", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+    overflow: hidden; overscroll-behavior: none; touch-action: none;
+    -webkit-user-select: none; user-select: none;
+  }
+  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .screen { position: fixed; inset: 0; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 16px); }
+  .hidden { display: none !important; }
+  h1 { font-size: 44px; line-height: 1; margin: 0 0 8px; font-weight: 900; letter-spacing: -1px; }
+  h2 { font-size: 22px; margin: 0; font-weight: 800; }
+  p { margin: 0; color: var(--muted); line-height: 1.4; }
+  button {
+    font: inherit; font-weight: 800; color: var(--text); background: var(--panel-2);
+    border: 0; border-radius: 14px; padding: 14px 18px; cursor: pointer;
+    transition: transform .08s ease, background .15s ease;
+  }
+  button:active { transform: scale(.96); }
+  button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  button.primary { background: var(--ink); color: #2a2100; }
+  button.ghost { background: transparent; color: var(--muted); }
+  button:disabled { opacity: .4; }
+
+  /* Login */
+  #login { justify-content: center; align-items: center; text-align: center; gap: 28px; }
+  .logo-ball { width: 84px; height: 84px; border-radius: 50%; background: var(--ball); position: relative; box-shadow: 0 0 0 10px rgba(255,255,255,.06); }
+  .logo-ball::after { content: ""; position: absolute; left: -50px; right: -50px; bottom: -14px; height: 7px; border-radius: 4px; background: var(--ink); transform: rotate(-14deg); }
+  #login .box { display: flex; flex-direction: column; gap: 14px; align-items: center; width: 100%; max-width: 320px; }
+  #gbtn { min-height: 44px; display: flex; justify-content: center; }
+  #gnote { font-size: 13px; color: var(--muted); }
+
+  /* Menu */
+  .topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--panel-2); object-fit: cover; display: grid; place-items: center; font-weight: 900; flex: none; }
+  .who { flex: 1; min-width: 0; }
+  .who b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who span { font-size: 13px; color: var(--muted); }
+  #grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; overflow-y: auto; padding-bottom: 12px; touch-action: pan-y; }
+  .lvl { aspect-ratio: 1; border-radius: var(--radius); background: var(--panel); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 26px; font-weight: 900; }
+  .lvl small { font-size: 15px; letter-spacing: 2px; color: var(--ink); min-height: 18px; }
+  .lvl.locked { opacity: .35; }
+
+  /* Jeu */
+  #game { padding-left: 12px; padding-right: 12px; gap: 10px; }
+  .hud { display: flex; align-items: center; gap: 10px; }
+  .hud .title { font-weight: 800; flex: 1; text-align: center; }
+  .icon-btn { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; font-size: 20px; }
+  .ink { height: 10px; border-radius: 6px; background: var(--panel); overflow: hidden; }
+  .ink i { display: block; height: 100%; width: 100%; background: var(--ink); border-radius: 6px; transition: width .08s linear; }
+  #stage { flex: 1; min-height: 0; display: grid; place-items: center; }
+  canvas { border-radius: 20px; touch-action: none; background: #1d2245; }
+  .actions { display: flex; gap: 10px; }
+  .actions button { flex: 1; }
+  .actions .primary { flex: 2; }
+
+  #toast { position: fixed; left: 50%; top: 96px; transform: translateX(-50%); background: var(--danger); color: #fff; font-weight: 800; padding: 10px 18px; border-radius: 30px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 5; white-space: nowrap; }
+  #toast.show { opacity: 1; }
+
+  #win { position: fixed; inset: 0; background: rgba(10,12,28,.78); display: flex; align-items: center; justify-content: center; z-index: 10; padding: 24px; }
+  #win .card { background: var(--panel); border-radius: 26px; padding: 28px 24px 22px; width: 100%; max-width: 340px; text-align: center; display: flex; flex-direction: column; gap: 16px; }
+  #stars { font-size: 44px; letter-spacing: 6px; color: var(--ink); }
+  #win .row { display: flex; gap: 10px; }
+  #win .row button { flex: 1; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- CONNEXION -->
+<section id="login" class="screen">
+  <div class="logo-ball" aria-hidden="true"></div>
+  <div>
+    <h1>Trace &amp; Roule</h1>
+    <p>Dessine un chemin, guide la balle jusqu'à la cible.</p>
+  </div>
+  <div class="box">
+    <div id="gbtn"></div>
+    <p id="gnote" class="hidden"></p>
+    <button id="guest" class="ghost">Jouer sans compte</button>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu" class="screen hidden">
+  <div class="topbar">
+    <div id="avatar" class="avatar"></div>
+    <div class="who"><b id="uname"></b><span id="ustars"></span></div>
+    <button id="logout" class="ghost">Quitter</button>
+  </div>
+  <h2>Niveaux</h2>
+  <div id="grid"></div>
+</section>
+
+<!-- JEU -->
+<section id="game" class="screen hidden">
+  <div class="hud">
+    <button id="back" class="icon-btn" aria-label="Retour aux niveaux">‹</button>
+    <div class="title" id="ltitle"></div>
+    <button id="undo" class="icon-btn" aria-label="Annuler le dernier trait">↶</button>
+  </div>
+  <div class="ink" aria-label="Encre restante"><i id="inkbar"></i></div>
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <div class="actions">
+    <button id="clear">Effacer</button>
+    <button id="go" class="primary">Lancer la balle</button>
+  </div>
+</section>
+
+<div id="toast"></div>
+
+<div id="win" class="hidden">
+  <div class="card">
+    <h2 id="wtitle">Bravo !</h2>
+    <div id="stars"></div>
+    <p id="wsub"></p>
+    <div class="row">
+      <button id="wretry">Rejouer</button>
+      <button id="wnext" class="primary">Suivant</button>
+    </div>
+    <button id="wmenu" class="ghost">Niveaux</button>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   CONFIG — remplace par ton identifiant client Google
+   (console.cloud.google.com → API et services → Identifiants
+    → ID client OAuth → Application Web)
+   ===================================================== */
+const GOOGLE_CLIENT_ID = "VOTRE_CLIENT_ID.apps.googleusercontent.com";
+
+/* ---------- Niveaux (monde virtuel 360 x 640) ---------- */
+const W = 360, H = 640;
+const LEVELS = [
+  { ink: 380, ball: [180, 80], goal: [180, 540, 24],
+    walls: [[110,280,250,280]], hazards: [] },
+  { ink: 420, ball: [70, 80], goal: [290, 540, 24],
+    walls: [[0,250,200,300]], hazards: [[180,540,18]] },
+  { ink: 450, ball: [290, 80], goal: [70, 540, 24],
+    walls: [[150,200,360,200],[0,360,210,360]], hazards: [[250,300,14]] },
+  { ink: 480, ball: [180, 70], goal: [300, 560, 24],
+    walls: [[100,220,260,220],[100,220,100,300],[260,220,260,300]],
+    hazards: [[60,420,16],[180,480,16]] },
+  { ink: 520, ball: [60, 70], goal: [60, 570, 24],
+    walls: [[0,200,240,200],[120,380,360,380]],
+    hazards: [[300,300,16],[200,570,16]] },
+  { ink: 450, ball: [180, 70], goal: [180, 585, 24],
+    walls: [[0,300,150,300],[210,300,360,300],[130,450,230,450]],
+    hazards: [[100,560,16],[260,560,16]] },
+  { ink: 560, ball: [300, 70], goal: [60, 585, 24],
+    walls: [[100,160,360,160],[0,300,260,300],[100,440,360,440]],
+    hazards: [[180,230,14],[80,370,14],[250,520,16]] },
+  { ink: 600, ball: [180, 60], goal: [180, 590, 22],
+    walls: [[60,180,180,230],[300,320,180,370],[60,460,180,510]],
+    hazards: [[300,200,16],[60,340,16],[300,480,16],[110,590,16],[250,590,16]] }
+];
+
+/* ---------- Constantes physique ---------- */
+const R = 10, G = 900, REST = 0.38, FRICTION = 0.015, SUB = 8;
+const STROKE = 5, WALL = 6;
+
+/* ---------- Utilisateur & progression ---------- */
+let user = null;
+const $ = id => document.getElementById(id);
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const progKey = () => "tr_prog_" + (user ? user.id : "guest");
+function getProg() {
+  const p = store.get(progKey()) || [];
+  while (p.length < LEVELS.length) p.push(0);
+  return p;
+}
+function setStars(i, s) {
+  const p = getProg();
+  if (s > p[i]) { p[i] = s; store.set(progKey(), p); }
+}
+
+/* ---------- Google Sign-In ---------- */
+function decodeJwt(t) {
+  const b = t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+  const json = decodeURIComponent(atob(b).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join(""));
+  return JSON.parse(json);
+}
+function onGoogle(resp) {
+  try {
+    const p = decodeJwt(resp.credential);
+    user = { id: p.sub, name: p.given_name || p.name || "Joueur", picture: p.picture || "", email: p.email || "" };
+    store.set("tr_user", user);
+    showMenu();
+  } catch (e) { toast("Connexion impossible"); }
+}
+function initGoogle() {
+  const note = $("gnote");
+  const configured = !GOOGLE_CLIENT_ID.startsWith("VOTRE_");
+  if (!configured) {
+    note.textContent = "Connexion Google : ajoute ton Client ID dans le code.";
+    note.classList.remove("hidden");
+    return;
+  }
+  if (!window.google || !google.accounts) {
+    if ((initGoogle.tries = (initGoogle.tries || 0) + 1) < 20) return setTimeout(initGoogle, 300);
+    note.textContent = "Google indisponible (hors ligne ou page non hébergée en https).";
+    note.classList.remove("hidden");
+    return;
+  }
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogle, auto_select: false });
+  google.accounts.id.renderButton($("gbtn"), { theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", locale: "fr", width: 280 });
+}
+
+/* ---------- Navigation ---------- */
+function show(id) { for (const s of ["login", "menu", "game"]) $(s).classList.toggle("hidden", s !== id); }
+function showMenu() {
+  running = false; cancelAnimationFrame(raf);
+  $("win").classList.add("hidden");
+  $("uname").textContent = user ? user.name : "Invité";
+  const av = $("avatar");
+  av.innerHTML = "";
+  if (user && user.picture) {
+    const img = document.createElement("img");
+    img.className = "avatar"; img.referrerPolicy = "no-referrer"; img.src = user.picture; img.alt = "";
+    av.replaceWith(img); img.id = "avatar";
+  } else {
+    av.textContent = (user ? user.name : "I")[0].toUpperCase();
+  }
+  const p = getProg();
+  $("ustars").textContent = "★ " + p.reduce((a, b) => a + b, 0) + " / " + LEVELS.length * 3;
+  const unlocked = p.findIndex(s => s === 0);
+  const maxOpen = unlocked === -1 ? LEVELS.length - 1 : unlocked;
+  const grid = $("grid"); grid.innerHTML = "";
+  LEVELS.forEach((_, i) => {
+    const b = document.createElement("button");
+    b.className = "lvl" + (i > maxOpen ? " locked" : "");
+    b.disabled = i > maxOpen;
+    b.innerHTML = (i + 1) + "<small>" + (p[i] ? "★".repeat(p[i]) + "☆".repeat(3 - p[i]) : "") + "</small>";
+    b.onclick = () => startLevel(i);
+    grid.appendChild(b);
+  });
+  show("menu");
+}
+function logout() {
+  store.del("tr_user"); user = null;
+  if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
+  show("login");
+}
+
+/* ---------- Jeu ---------- */
+const cv = $("cv"), ctx = cv.getContext("2d");
+let lvl = 0, L, ball, strokes, segs, inkUsed, running, raf, last, elapsed, drawing = null, scale = 1;
+
+function fit() {
+  const st = $("stage").getBoundingClientRect();
+  const s = Math.min(st.width / W, st.height / H);
+  const dpr = window.devicePixelRatio || 1;
+  cv.style.width = W * s + "px"; cv.style.height = H * s + "px";
+  cv.width = Math.round(W * s * dpr); cv.height = Math.round(H * s * dpr);
+  scale = s * dpr;
+}
+window.addEventListener("resize", () => { if (!$("game").classList.contains("hidden")) { fit(); render(); } });
+
+function startLevel(i) {
+  lvl = i; L = LEVELS[i];
+  strokes = []; segs = []; inkUsed = 0;
+  $("win").classList.add("hidden");
+  $("ltitle").textContent = "Niveau " + (i + 1);
+  show("game");
+  fit(); resetBall(); updateInk(); render();
+}
+function resetBall() {
+  ball = { x: L.ball[0], y: L.ball[1], vx: 0, vy: 0 };
+  running = false; elapsed = 0;
+  cancelAnimationFrame(raf);
+  $("go").textContent = "Lancer la balle";
+  render();
+}
+function updateInk() { $("inkbar").style.width = Math.max(0, 100 * (1 - inkUsed / L.ink)) + "%"; }
+function rebuildSegs() {
+  segs = [];
+  for (const s of strokes) for (let i = 1; i < s.length; i++) segs.push([s[i-1][0], s[i-1][1], s[i][0], s[i][1]]);
+}
+
+/* Dessin au doigt */
+function pos(e) {
+  const r = cv.getBoundingClientRect();
+  return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
+}
+cv.addEventListener("pointerdown", e => {
+  if (inkUsed >= L.ink) return;
+  cv.setPointerCapture(e.pointerId);
+  const p = pos(e);
+  drawing = [p]; strokes.push(drawing);
+  render();
+});
+cv.addEventListener("pointermove", e => {
+  if (!drawing) return;
+  const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const ev of (events.length ? events : [e])) {
+    const p = pos(ev), q = drawing[drawing.length - 1];
+    const d = Math.hypot(p[0] - q[0], p[1] - q[1]);
+    if (d < 6) continue;
+    if (inkUsed + d > L.ink) { drawing = null; break; }
+    drawing.push(p); inkUsed += d;
+    segs.push([q[0], q[1], p[0], p[1]]);
+  }
+  updateInk(); render();
+});
+const endDraw = () => { drawing = null; };
+cv.addEventListener("pointerup", endDraw);
+cv.addEventListener("pointercancel", endDraw);
+
+/* Physique */
+function collide(x1, y1, x2, y2, th) {
+  const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy;
+  let t = l2 ? ((ball.x - x1) * dx + (ball.y - y1) * dy) / l2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  const cx = x1 + t * dx, cy = y1 + t * dy;
+  let nx = ball.x - cx, ny = ball.y - cy, d = Math.hypot(nx, ny);
+  const min = R + th / 2;
+  if (d >= min) return;
+  if (d < 1e-6) { nx = 0; ny = -1; d = 0; } else { nx /= d; ny /= d; }
+  ball.x = cx + nx * min; ball.y = cy + ny * min;
+  const vn = ball.vx * nx + ball.vy * ny;
+  if (vn < 0) {
+    const k = Math.abs(vn) < 60 ? 1 : 1 + REST;   // pas de rebond minuscule
+    ball.vx -= k * vn * nx; ball.vy -= k * vn * ny;
+    const tx = -ny, ty = nx, vt = ball.vx * tx + ball.vy * ty;
+    ball.vx -= vt * FRICTION * tx; ball.vy -= vt * FRICTION * ty;
+  }
+}
+function step(dt) {
+  ball.vy += G * dt;
+  ball.x += ball.vx * dt; ball.y += ball.vy * dt;
+  for (const w of L.walls) collide(w[0], w[1], w[2], w[3], WALL);
+  for (const s of segs) collide(s[0], s[1], s[2], s[3], STROKE);
+  if (ball.x < R) { ball.x = R; ball.vx = Math.abs(ball.vx) * REST; }
+  if (ball.x > W - R) { ball.x = W - R; ball.vx = -Math.abs(ball.vx) * REST; }
+  for (const h of L.hazards) if (Math.hypot(ball.x - h[0], ball.y - h[1]) < R + h[2] - 3) return "lose";
+  if (Math.hypot(ball.x - L.goal[0], ball.y - L.goal[1]) < L.goal[2] - 2) return "win";
+  if (ball.y > H + 40) return "lose";
+  return null;
+}
+function loop(t) {
+  if (!running) return;
+  const dt = Math.min(0.033, (t - last) / 1000 || 0.016); last = t;
+  elapsed += dt;
+  for (let i = 0; i < SUB; i++) {
+    const r = step(dt / SUB);
+    if (r) return finish(r);
+  }
+  if (elapsed > 20) return finish("lose");
+  render();
+  raf = requestAnimationFrame(loop);
+}
+function finish(r) {
+  running = false; render();
+  if (r === "win") {
+    const ratio = inkUsed / L.ink;
+    const stars = ratio < 0.4 ? 3 : ratio < 0.7 ? 2 : 1;
+    setStars(lvl, stars);
+    $("stars").textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
+    $("wtitle").textContent = "Bravo !";
+    $("wsub").textContent = "Encre utilisée : " + Math.round(ratio * 100) + " %";
+    $("wnext").classList.toggle("hidden", lvl >= LEVELS.length - 1);
+    $("win").classList.remove("hidden");
+  } else {
+    toast("Raté ! Modifie ton tracé");
+    resetBall();
+  }
+}
+$("go").onclick = () => {
+  if (running) { resetBall(); return; }
+  resetBall(); running = true; last = performance.now();
+  $("go").textContent = "Stop";
+  raf = requestAnimationFrame(loop);
+};
+$("clear").onclick = () => { strokes = []; segs = []; inkUsed = 0; updateInk(); resetBall(); };
+$("undo").onclick = () => {
+  const s = strokes.pop();
+  if (s) { for (let i = 1; i < s.length; i++) inkUsed -= Math.hypot(s[i][0]-s[i-1][0], s[i][1]-s[i-1][1]); inkUsed = Math.max(0, inkUsed); }
+  rebuildSegs(); updateInk(); resetBall();
+};
+$("back").onclick = showMenu;
+$("wmenu").onclick = showMenu;
+$("wretry").onclick = () => startLevel(lvl);
+$("wnext").onclick = () => startLevel(lvl + 1);
+
+/* Rendu */
+function render() {
+  if (!L) return;
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  ctx.lineCap = "round"; ctx.lineJoin = "round";
+
+  // murs
+  ctx.strokeStyle = "#8a96d6"; ctx.lineWidth = WALL;
+  for (const w of L.walls) { ctx.beginPath(); ctx.moveTo(w[0], w[1]); ctx.lineTo(w[2], w[3]); ctx.stroke(); }
+
+  // cible
+  const [gx, gy, gr] = L.goal;
+  ctx.fillStyle = "rgba(6,214,160,.18)"; ctx.beginPath(); ctx.arc(gx, gy, gr + 8, 0, 7); ctx.fill();
+  ctx.strokeStyle = "#06d6a0"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(gx, gy, gr, 0, 7); ctx.stroke();
+  ctx.fillStyle = "#06d6a0"; ctx.beginPath(); ctx.arc(gx, gy, gr * 0.35, 0, 7); ctx.fill();
+
+  // pièges
+  for (const h of L.hazards) {
+    ctx.fillStyle = "#ef476f";
+    for (let i = 0; i < 8; i++) {
+      const a = i * Math.PI / 4;
+      ctx.beginPath();
+      ctx.moveTo(h[0] + Math.cos(a - .28) * h[2], h[1] + Math.sin(a - .28) * h[2]);
+      ctx.lineTo(h[0] + Math.cos(a) * (h[2] + 8), h[1] + Math.sin(a) * (h[2] + 8));
+      ctx.lineTo(h[0] + Math.cos(a + .28) * h[2], h[1] + Math.sin(a + .28) * h[2]);
+      ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(h[0], h[1], h[2], 0, 7); ctx.fill();
+  }
+
+  // traits du joueur
+  ctx.strokeStyle = "#ffd166"; ctx.lineWidth = STROKE;
+  for (const s of strokes) {
+    if (s.length === 1) { ctx.fillStyle = "#ffd166"; ctx.beginPath(); ctx.arc(s[0][0], s[0][1], STROKE / 2, 0, 7); ctx.fill(); continue; }
+    ctx.beginPath(); ctx.moveTo(s[0][0], s[0][1]);
+    for (let i = 1; i < s.length; i++) ctx.lineTo(s[i][0], s[i][1]);
+    ctx.stroke();
+  }
+
+  // balle
+  ctx.fillStyle = "#f4f5fb"; ctx.beginPath(); ctx.arc(ball.x, ball.y, R, 0, 7); ctx.fill();
+  ctx.fillStyle = "rgba(22,26,51,.25)"; ctx.beginPath(); ctx.arc(ball.x + 3, ball.y + 3, R * 0.45, 0, 7); ctx.fill();
+}
+
+/* Toast */
+let tt;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 1600); }
+
+/* Démarrage */
+$("guest").onclick = () => { user = null; store.del("tr_user"); showMenu(); };
+$("logout").onclick = logout;
+user = store.get("tr_user");
+if (user) showMenu(); else { show("login"); initGoogle(); }
+</script>
+</body>
+</html>

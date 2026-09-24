@@ -1,0 +1,13 @@
+{
+  "appId": "com.tracenroule.game",
+  "appName": "Trace & Roule",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SocialLogin": {
+      "providers": { "google": true, "facebook": false, "apple": false, "twitter": false }
+    }
+  }
+}
