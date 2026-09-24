@@ -4,7 +4,7 @@
 window.CFG = {
   // ID client OAuth de type "Application Web" (Google Cloud Console).
   // Utilisé pour la connexion Google dans l'appli Android ET dans le navigateur.
-  GOOGLE_WEB_CLIENT_ID: "VOTRE_CLIENT_ID_WEB.apps.googleusercontent.com",
+  GOOGLE_WEB_CLIENT_ID: "701673972686-419fufdkmjhcfu3eol1e28roql3dc7h8.apps.googleusercontent.com",
 
   // Adresse publique de ta politique de confidentialité (voir docs/privacy.html)
   PRIVACY_URL: "https://VOTRE-NOM.github.io/trace-et-roule/privacy.html",
