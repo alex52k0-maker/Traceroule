@@ -277,7 +277,7 @@ const Ads = {
   setBanner(h) { document.documentElement.style.setProperty("--banner", (h || 0) + "px"); if (game && !game.classList.contains("hidden")) { fit(); render(); } },
   async init() {
     const AdMob = Plug("AdMob");
-    if (!Native || !AdMob) return;
+    if (!Native || !AdMob || CFG.ADS.enabled !== true) return;
     try {
       let info = await AdMob.requestConsentInfo();
       if (info && info.isConsentFormAvailable && info.status === "REQUIRED") info = await AdMob.showConsentForm();
@@ -564,6 +564,7 @@ $("adprefs").onclick = () => { try { Plug("AdMob").showPrivacyOptionsForm(); } c
 user = store.get("tr_user");
 if (user) showMenu(); else { show("login"); initGoogle(); }
 Ads.init();
+if (CFG.ADS.enabled !== true) $("bonus").classList.add("hidden");
 </script>
 </body>
 </html>
