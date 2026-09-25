@@ -177,7 +177,7 @@
 <section id="menu" class="screen hidden">
   <div class="topbar">
     <div id="avatar" class="avatar"></div>
-    <div class="who"><b id="uname"></b><span id="ustars"></span><small id="cloud"></small></div>
+    <div class="who"><b id="uname"></b><span id="ustars"></span><small id="cloud" style="text-decoration:underline"></small></div>
     <button id="snd" aria-label="Son">🔊</button>
     <button id="logout" class="ghost">Quitter</button>
   </div>
@@ -690,6 +690,7 @@ function paintCloud() {
   else if (!Cloud.enabled()) t = "Sauvegarde sur cet appareil";
   else t = { ok: "☁️ Progression sauvegardée", sync: "☁️ Synchronisation…", err: "⚠️ Hors ligne · sauvegarde locale", relog: "🔑 Reconnecte-toi pour sauvegarder", off: "" }[Cloud.status] || "";
   el.textContent = t;
+  el.onclick = () => alert("Statut cloud : " + Cloud.status + "\nDétail : " + (Cloud.msg || "(aucun détail)") + "\nActivé : " + Cloud.enabled() + "\nUtilisateur : " + (user ? user.id : "aucun"));
 }
 function logout() {
   Cloud.clear();
