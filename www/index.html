@@ -535,6 +535,7 @@ async function nativeGoogle() {
   } catch (e) {
     console.error(e);
     toast("Connexion annulée ou impossible");
+    alert("Détail de l'erreur de connexion :\n" + (e && (e.message || JSON.stringify(e))));
   }
 }
 function initGoogle() {
