@@ -4,7 +4,7 @@
 window.CFG = {
   // ID client OAuth de type "Application Web" (Google Cloud Console).
   // Utilisé pour la connexion Google dans l'appli Android ET dans le navigateur.
-  GOOGLE_WEB_CLIENT_ID: "683688408108-4o11fuclashrpstv52o750bm88poei4e.apps.googleusercontent.com",
+  GOOGLE_WEB_CLIENT_ID: "683688408108-6dm5hgfc8f4kui0eo7e9q0440mbsghos.apps.googleusercontent.com",
    FIREBASE: {
     apiKey: "AIzaSyDOP6BkVRXN5lxmrPrcXHej4wf5D0t-CBQ",
     projectId: "traceroule-6fbe3"
