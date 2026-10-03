@@ -14,6 +14,7 @@ window.CFG = {
   PRIVACY_URL: "https://alex52k0-maker.github.io/trace-et-roule/privacy.html",
 
   ADS: {
+    enabled: true,
     // true  = publicités de TEST Google (obligatoire pendant le développement)
     // false = vraies publicités (à mettre AVANT de publier sur le Play Store)
     test: true,
