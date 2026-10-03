@@ -110,6 +110,51 @@
   @keyframes nowPulse { 0%,100% { box-shadow: 0 6px 14px rgba(0,0,0,.28), 0 0 0 0 rgba(255,255,255,.7); } 50% { box-shadow: 0 6px 14px rgba(0,0,0,.28), 0 0 0 9px rgba(255,255,255,0); } }
   .foot { display: flex; justify-content: center; gap: 4px; padding-top: 6px; }
   .foot button { font-size: 13px; padding: 8px 12px; color: var(--muted); font-weight: 700; background: transparent; }
+  .pillcoin { background: rgba(255,255,255,.12); padding: 8px 14px; border-radius: 20px; font-weight: 900; color: var(--ink); font-size: 14px; }
+
+  /* ---------- Accueil ---------- */
+  #home { background: radial-gradient(120% 70% at 50% 0%, #2a2170 0%, #151038 55%, #0d0a24 100%); justify-content: flex-start; }
+  #avatarH, #avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #7c6cff, #ff4d78); object-fit: cover; display: grid; place-items: center; font-weight: 900; flex: none; border: 2px solid rgba(255,255,255,.4); }
+  #avatarH img, #avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  #coinsH { font-size: 14px; color: var(--ink); font-weight: 900; }
+  #homeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+  .navcard { aspect-ratio: 1; border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px;
+    background: linear-gradient(160deg, var(--c1), var(--c2)); box-shadow: 0 10px 22px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.22);
+    animation: tileIn .5s cubic-bezier(.3,1.5,.5,1) both; }
+  .navcard:nth-child(2) { animation-delay: .06s; } .navcard:nth-child(3) { animation-delay: .12s; } .navcard:nth-child(4) { animation-delay: .18s; }
+  .navcard .ni { font-size: 40px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.3)); }
+  .navcard b { font-size: 18px; font-weight: 900; }
+  .navcard small { font-size: 12px; color: rgba(255,255,255,.85); font-weight: 700; }
+  .homeBallPreview { flex: 1; display: grid; place-items: center; min-height: 0; }
+  .homeBallPreview canvas { opacity: .9; }
+
+  /* ---------- Boutique ---------- */
+  #shop { background: radial-gradient(120% 70% at 50% 0%, #3a2a0d 0%, #1b1308 55%, #0d0a24 100%); }
+  #shopTabs { display: flex; gap: 8px; margin: 14px 0 10px; }
+  .shoptab { flex: 1; padding: 10px; font-size: 14px; background: rgba(255,255,255,.08); color: var(--muted); }
+  .shoptab.on { background: linear-gradient(135deg, #ffd166, #ff9f43); color: #3a2400; }
+  #shopGrid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 10px; align-content: start; }
+  .skin-card { border-radius: 20px; background: rgba(255,255,255,.07); padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; border: 2px solid transparent; }
+  .skin-card.owned { border-color: rgba(6,214,160,.5); }
+  .skin-card.equipped { border-color: var(--goal); background: rgba(6,214,160,.12); }
+  .skin-card canvas { width: 64px; height: 64px; }
+  .skin-card b { font-size: 14px; text-align: center; }
+  .skin-card button { width: 100%; font-size: 13px; padding: 9px; }
+  .skin-card .price { font-size: 13px; color: var(--ink); font-weight: 900; }
+  .skin-card .locked-label { font-size: 11px; color: var(--muted); }
+
+  /* ---------- Paramètres ---------- */
+  #settings { background: radial-gradient(120% 70% at 50% 0%, #2a2170 0%, #151038 55%, #0d0a24 100%); }
+  #settingsList { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .srow { display: flex; align-items: center; gap: 12px; padding: 14px; background: rgba(255,255,255,.06); border-radius: 18px; }
+  .srow .who b { display: block; } .srow .who span { font-size: 13px; color: var(--ink); font-weight: 800; }
+  .srow .who small { display: block; font-size: 11px; color: var(--muted); }
+  .setbtn { text-align: left; padding: 15px; font-size: 15px; background: rgba(255,255,255,.07); }
+
+  /* ---------- 1v1 placeholder ---------- */
+  #duel { background: radial-gradient(120% 70% at 50% 0%, #4a1030 0%, #1b0a18 55%, #0d0a24 100%); }
+  .comingSoon { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 0 20px; }
+  .comingSoon h2 { font-size: 22px; } .comingSoon p { color: var(--muted); }
 
   /* ---------- Jeu ---------- */
   #game { padding-left: 12px; padding-right: 12px; gap: 9px; background: linear-gradient(180deg, var(--top, #12324a), var(--bot, #1f6f6b)); }
@@ -173,19 +218,74 @@
   </div>
 </section>
 
-<!-- MENU -->
+<!-- ACCUEIL -->
+<section id="home" class="screen hidden">
+  <div class="topbar">
+    <div id="avatarH" class="avatar"></div>
+    <div class="who"><b id="unameH"></b><span id="coinsH">🪙 0</span></div>
+    <button id="settingsBtn" class="icon-btn" aria-label="Paramètres">⚙️</button>
+  </div>
+  <div id="homeGrid">
+    <button id="navCampagne" class="navcard" style="--c1:#2ec4b6;--c2:#1b8a7a"><span class="ni">🗺️</span><b>Campagne</b><small id="campagneSub"></small></button>
+    <button id="navDuel" class="navcard" style="--c1:#ff6fa0;--c2:#b0306a"><span class="ni">⚔️</span><b>1 vs 1</b><small>Duel en direct</small></button>
+    <button id="navShop" class="navcard" style="--c1:#ffb84d;--c2:#c17a2b"><span class="ni">🛍️</span><b>Boutique</b><small>Skins & objets</small></button>
+    <button id="navSettings" class="navcard" style="--c1:#9d7bff;--c2:#5b3fc9"><span class="ni">⚙️</span><b>Paramètres</b><small>Compte & options</small></button>
+  </div>
+  <div class="homeBallPreview"><canvas id="prevCv" width="140" height="140"></canvas></div>
+</section>
+
+<!-- CAMPAGNE -->
 <section id="menu" class="screen hidden">
   <div class="topbar">
-    <div id="avatar" class="avatar"></div>
-    <div class="who"><b id="uname"></b><span id="ustars"></span><small id="cloud" style="text-decoration:underline"></small></div>
-    <button id="snd" aria-label="Son">🔊</button>
-    <button id="logout" class="ghost">Quitter</button>
+    <button id="backHome1" class="icon-btn" aria-label="Accueil">‹</button>
+    <div class="who" style="text-align:center;flex:1"><b>Campagne</b></div>
+    <span id="ustars" class="pillcoin">★ 0</span>
   </div>
   <div class="pwrap"><i id="pbar"></i></div>
   <div id="worlds"></div>
-  <div class="foot">
-    <button id="privacy">Confidentialité</button>
-    <button id="adprefs" class="hidden">Préférences de pub</button>
+</section>
+
+<!-- BOUTIQUE -->
+<section id="shop" class="screen hidden">
+  <div class="topbar">
+    <button id="backHome2" class="icon-btn" aria-label="Accueil">‹</button>
+    <div class="who" style="text-align:center;flex:1"><b>Boutique</b></div>
+    <span id="coinsShop" class="pillcoin">🪙 0</span>
+  </div>
+  <div id="shopTabs">
+    <button id="tabCoins" class="shoptab on">Avec des pièces</button>
+    <button id="tabPremium" class="shoptab">Exclusifs</button>
+  </div>
+  <div id="shopGrid"></div>
+</section>
+
+<!-- PARAMÈTRES -->
+<section id="settings" class="screen hidden">
+  <div class="topbar">
+    <button id="backHome3" class="icon-btn" aria-label="Accueil">‹</button>
+    <div class="who" style="text-align:center;flex:1"><b>Paramètres</b></div>
+    <span style="width:44px"></span>
+  </div>
+  <div id="settingsList">
+    <div class="srow"><div id="avatar" class="avatar"></div><div class="who"><b id="uname"></b><span id="ustarsS"></span><small id="cloud" style="text-decoration:underline"></small></div></div>
+    <button id="snd" class="setbtn">🔊 Son : activé</button>
+    <button id="logout" class="setbtn">Quitter / changer de compte</button>
+    <button id="privacy" class="setbtn">Confidentialité</button>
+    <button id="adprefs" class="setbtn hidden">Préférences de pub</button>
+  </div>
+</section>
+
+<!-- 1v1 (bientôt disponible en phase 2) -->
+<section id="duel" class="screen hidden">
+  <div class="topbar">
+    <button id="backHome4" class="icon-btn" aria-label="Accueil">‹</button>
+    <div class="who" style="text-align:center;flex:1"><b>1 vs 1</b></div>
+    <span style="width:44px"></span>
+  </div>
+  <div class="comingSoon">
+    <div style="font-size:60px">⚔️</div>
+    <h2>Bientôt disponible</h2>
+    <p>Le mode duel en direct arrive dans une prochaine mise à jour.</p>
   </div>
 </section>
 
@@ -1100,7 +1200,13 @@ function getProg() {
 }
 function setStars(i, s) {
   const p = getProg();
-  if (s > p[i]) { p[i] = s; store.set(progKey(), p); Cloud.push(); }
+  const prev = Math.max(0, p[i]);
+  if (s > p[i]) {
+    p[i] = s; store.set(progKey(), p);
+    const gained = (s - prev) * 10 + (prev === 0 ? 5 : 0);   // +10 par étoile gagnée, +5 bonus de première victoire
+    if (gained > 0) Coins.add(gained, "niveau");
+    Cloud.push();
+  }
 }
 function setSkipped(i) {
   const p = getProg();
@@ -1168,14 +1274,26 @@ const Cloud = {
     if (r.status === 404) return null;
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error((j.error && j.error.message) || ("HTTP " + r.status));
-    const f = j.fields && j.fields.progress && j.fields.progress.stringValue;
-    return f ? JSON.parse(f) : null;
+    const f = j.fields || {};
+    const get = k => f[k] && f[k].stringValue;
+    const getI = k => f[k] && parseInt(f[k].integerValue || "0", 10);
+    return {
+      progress: get("progress") ? JSON.parse(get("progress")) : null,
+      coinsEarned: getI("coinsEarned") || 0,
+      coinsSpent: getI("coinsSpent") || 0,
+      ownedSkins: get("ownedSkins") ? JSON.parse(get("ownedSkins")) : null
+    };
   },
-  async save(p) {
+  async save(p, coinsEarned, coinsSpent, ownedSkins) {
     const t = await this.token();
-    const r = await fetch(this.url() + "?updateMask.fieldPaths=progress&updateMask.fieldPaths=name&updateMask.fieldPaths=updated", {
+    const mask = ["progress", "name", "updated", "coinsEarned", "coinsSpent", "ownedSkins"].map(k => "updateMask.fieldPaths=" + k).join("&");
+    const r = await fetch(this.url() + "?" + mask, {
       method: "PATCH", headers: { Authorization: "Bearer " + t, "Content-Type": "application/json" },
-      body: JSON.stringify({ fields: { progress: { stringValue: JSON.stringify(p) }, name: { stringValue: user.name || "" }, updated: { integerValue: String(Date.now()) } } }) });
+      body: JSON.stringify({ fields: {
+        progress: { stringValue: JSON.stringify(p) }, name: { stringValue: user.name || "" }, updated: { integerValue: String(Date.now()) },
+        coinsEarned: { integerValue: String(coinsEarned) }, coinsSpent: { integerValue: String(coinsSpent) },
+        ownedSkins: { stringValue: JSON.stringify(ownedSkins) }
+      } }) });
     if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error((j.error && j.error.message) || ("HTTP " + r.status)); }
   },
   /* Synchronisation : on fusionne local + cloud, puis on réécrit si besoin */
@@ -1186,11 +1304,17 @@ const Cloud = {
       try {
         const remote = await this.load();
         const local = getProg(), before = JSON.stringify(local);
-        const merged = mergeProg(local, remote || []);
+        const merged = mergeProg(local, remote && remote.progress || []);
         store.set(progKey(), merged);
-        if (!remote || JSON.stringify(mergeProg(remote, [])) !== JSON.stringify(merged)) await this.save(merged);
+        const ce = Math.max(Coins.earned(), (remote && remote.coinsEarned) || 0);
+        const cs = Math.max(Coins.spent(), (remote && remote.coinsSpent) || 0);
+        const os = Array.from(new Set([...Skins.owned(), ...((remote && remote.ownedSkins) || [])]));
+        Coins.setTotals(ce, cs); Skins.setOwned(os);
+        const changed = !remote || before !== JSON.stringify(merged) || ce !== remote.coinsEarned || cs !== remote.coinsSpent || os.length !== (remote.ownedSkins || []).length;
+        if (changed) await this.save(merged, ce, cs, os);
         this.setStatus("ok");
         if (before !== JSON.stringify(merged) && !$("menu").classList.contains("hidden")) buildMenu();
+        if (typeof refreshCoinUI === "function") refreshCoinUI();
       } catch (e) {
         console.warn("Cloud sync", e);
         this.setStatus(e.message === "session-expired" ? "relog" : "err", e.message);
@@ -1202,6 +1326,114 @@ const Cloud = {
   setStatus(s, msg) { this.status = s; this.msg = msg || ""; if (typeof paintCloud === "function") paintCloud(); },
   clear() { this.auth = null; store.del("tr_fb"); this.status = "off"; paintCloud(); }
 };
+
+/* ---------- Pièces d'or ---------- */
+const coinKey = () => "tr_coins_" + (user ? user.id : "guest");
+const Coins = {
+  earned() { return (store.get(coinKey()) || { e: 0, s: 0 }).e; },
+  spent() { return (store.get(coinKey()) || { e: 0, s: 0 }).s; },
+  balance() { return Math.max(0, this.earned() - this.spent()); },
+  setTotals(e, s) { store.set(coinKey(), { e, s }); if (typeof refreshCoinUI === "function") refreshCoinUI(); },
+  add(n, why) {
+    const d = store.get(coinKey()) || { e: 0, s: 0 }; d.e += n; store.set(coinKey(), d);
+    toast("🪙 +" + n + " pièces" + (why ? " · " + why : ""), true);
+    Cloud.push(); if (typeof refreshCoinUI === "function") refreshCoinUI();
+  },
+  spend(n) {
+    if (this.balance() < n) return false;
+    const d = store.get(coinKey()) || { e: 0, s: 0 }; d.s += n; store.set(coinKey(), d);
+    Cloud.push(); if (typeof refreshCoinUI === "function") refreshCoinUI(); return true;
+  },
+  /* à la connexion : on reprend les pièces gagnées en invité */
+  onLogin() {
+    const guest = store.get("tr_coins_guest");
+    if (guest && (guest.e || guest.s)) {
+      const mine = store.get(coinKey()) || { e: 0, s: 0 };
+      this.setTotals(mine.e + guest.e, mine.s + guest.s);
+      store.del("tr_coins_guest");
+    }
+    const gs = store.get("tr_skins_guest");
+    if (gs && gs.length) { Skins.setOwned(Array.from(new Set([...Skins.owned(), ...gs]))); store.del("tr_skins_guest"); }
+  }
+};
+function refreshCoinUI() {
+  const b = Coins.balance();
+  for (const id of ["coinsH", "coinsShop"]) { const el = $(id); if (el) el.textContent = "🪙 " + b; }
+}
+
+/* ---------- Skins (apparence de la balle) ---------- */
+const SKINS = [
+  { id: "classic",  name: "Classique", price: 0,   c1: "#ffffff", c2: "#c9d2ff" },
+  { id: "sun",      name: "Soleil",    price: 60,  c1: "#fff3b0", c2: "#ffb703" },
+  { id: "mint",     name: "Menthe",    price: 60,  c1: "#c8ffe8", c2: "#2ec4b6" },
+  { id: "berry",    name: "Myrtille",  price: 90,  c1: "#d6c6ff", c2: "#6f42c1" },
+  { id: "lava",     name: "Lave",      price: 90,  c1: "#ffb37a", c2: "#c1392b" },
+  { id: "sakura",   name: "Sakura",    price: 120, c1: "#ffd6e8", c2: "#ff6fa0" },
+  { id: "storm",    name: "Orage",     price: 120, c1: "#cfe6ff", c2: "#2e5f8a" },
+  { id: "gold",     name: "Or",        price: 220, c1: "#fff0b3", c2: "#d4a017" },
+  { id: "aurora",   name: "Aurore",    price: 260, c1: "#b3ffe0", c2: "#7c6cff" },
+  { id: "galaxy",   name: "Galaxie",   price: 0, premium: true, priceLabel: "2,99 €", productId: "skin_galaxy",   c1: "#e0c6ff", c2: "#2a1050" },
+  { id: "diamond",  name: "Diamant",   price: 0, premium: true, priceLabel: "4,99 €", productId: "skin_diamond",  c1: "#eafaff", c2: "#4fc3f7" }
+];
+const skinsKey = () => "tr_skins_" + (user ? user.id : "guest");
+const selSkinKey = () => "tr_skinsel_" + (user ? user.id : "guest");
+const Skins = {
+  owned() { const o = store.get(skinsKey()) || ["classic"]; return o.includes("classic") ? o : ["classic", ...o]; },
+  setOwned(list) { store.set(skinsKey(), Array.from(new Set(["classic", ...list]))); },
+  own(id) { const o = this.owned(); if (!o.includes(id)) { this.setOwned([...o, id]); Cloud.push(); } },
+  has(id) { return this.owned().includes(id); },
+  selected() { return store.get(selSkinKey()) || "classic"; },
+  select(id) { store.set(selSkinKey(), id); },
+  current() { return SKINS.find(s => s.id === this.selected()) || SKINS[0]; },
+  buy(sk) {
+    if (sk.premium) { toast("Objet exclusif : bientôt disponible"); return; }
+    if (this.has(sk.id)) return;
+    if (!Coins.spend(sk.price)) { toast("Pas assez de pièces"); return; }
+    this.own(sk.id); toast("Skin débloqué !", true); Snd.win();
+  }
+};
+
+/* ---------- Boutique ---------- */
+let shopTab = "coins";
+function openShop() {
+  refreshCoinUI(); renderShop(); show("shop");
+}
+function skinPreview(ctx, sk, size) {
+  const r = size * 0.38, cx = size / 2, cy = size / 2;
+  const g = ctx.createRadialGradient(cx - r * .3, cy - r * .35, 2, cx, cy, r);
+  g.addColorStop(0, sk.c1); g.addColorStop(1, sk.c2);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,.25)"; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = "#22224a";
+  for (const ex of [-r * .35, r * .35]) {
+    ctx.beginPath(); ctx.arc(cx + ex, cy - r * .1, r * .14, 0, 7); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(cx + ex - r * .05, cy - r * .18, r * .05, 0, 7); ctx.fill(); ctx.fillStyle = "#22224a";
+  }
+}
+function renderShop() {
+  $("tabCoins").classList.toggle("on", shopTab === "coins");
+  $("tabPremium").classList.toggle("on", shopTab === "premium");
+  const grid = $("shopGrid"); grid.innerHTML = "";
+  const list = SKINS.filter(s => s.id !== "classic" && (shopTab === "premium" ? s.premium : !s.premium));
+  for (const sk of list) {
+    const owned = Skins.has(sk.id), equipped = Skins.selected() === sk.id;
+    const card = document.createElement("div");
+    card.className = "skin-card" + (owned ? " owned" : "") + (equipped ? " equipped" : "");
+    const cv = document.createElement("canvas"); cv.width = 96; cv.height = 96;
+    card.appendChild(cv);
+    const b = document.createElement("b"); b.textContent = sk.name; card.appendChild(b);
+    const btn = document.createElement("button");
+    if (equipped) { btn.textContent = "Équipé"; btn.disabled = true; }
+    else if (owned) { btn.textContent = "Équiper"; btn.className = "primary"; btn.onclick = () => { Skins.select(sk.id); Snd.pop(); renderShop(); drawHomePreview(); }; }
+    else if (sk.premium) { btn.innerHTML = sk.priceLabel; btn.onclick = () => Skins.buy(sk); }
+    else { btn.innerHTML = "🪙 " + sk.price; btn.onclick = () => { Skins.buy(sk); renderShop(); }; }
+    card.appendChild(btn);
+    grid.appendChild(card);
+    skinPreview(cv.getContext("2d"), sk, 96);
+  }
+}
+$("tabCoins").onclick = () => { shopTab = "coins"; Snd.pop(); renderShop(); };
+$("tabPremium").onclick = () => { shopTab = "premium"; Snd.pop(); renderShop(); };
 
 /* ---------- Sons & vibrations ---------- */
 const Snd = {
@@ -1251,7 +1483,8 @@ function setUser(p, idToken) {
   store.set("tr_user", user);
   // la progression jouée en invité est reprise dans le compte
   if (guest && guest.some(x => x !== 0)) store.set(progKey(), mergeProg(getProg(), guest));
-  showMenu();
+  Coins.onLogin();
+  showHome();
   Cloud.login(idToken);
 }
 function onGoogle(resp) {
@@ -1359,30 +1592,65 @@ const Ads = {
 
 /* ---------- Navigation ---------- */
 function show(id) {
-  for (const s of ["login", "menu", "game"]) $(s).classList.toggle("hidden", s !== id);
+  for (const s of ["login", "home", "menu", "shop", "settings", "duel", "game"]) $(s).classList.toggle("hidden", s !== id);
   gameOn = id === "game";
   if (gameOn && !framing) { framing = true; lastT = performance.now(); requestAnimationFrame(frame); }
+}
+function fillAvatar(el) {
+  el.innerHTML = "";
+  if (user && user.picture) {
+    const img = document.createElement("img");
+    img.referrerPolicy = "no-referrer"; img.src = user.picture; img.alt = "";
+    el.appendChild(img);
+  } else {
+    el.textContent = (user ? user.name : "I")[0].toUpperCase();
+  }
+}
+function showHome() {
+  phase = 0;
+  $("win").classList.add("hidden");
+  fillAvatar($("avatarH"));
+  $("unameH").textContent = user ? user.name : "Invité";
+  $("coinsH").textContent = "🪙 " + Coins.balance();
+  const p = getProg();
+  const done = p.reduce((a, b) => a + (b !== 0 ? 1 : 0), 0);
+  $("campagneSub").textContent = done ? done + "/" + LEVELS.length + " niveaux" : "Commencer";
+  drawHomePreview();
+  show("home");
+}
+function drawHomePreview() {
+  const c = $("prevCv"); if (!c) return;
+  const g = c.getContext("2d"); g.clearRect(0, 0, 140, 140);
+  const sk = Skins.current();
+  g.save(); g.translate(70, 76);
+  const bg = g.createRadialGradient(-7, -8, 2, 0, 0, 30); bg.addColorStop(0, sk.c1); bg.addColorStop(1, sk.c2);
+  g.fillStyle = bg; g.beginPath(); g.arc(0, 0, 28, 0, 7); g.fill();
+  g.strokeStyle = "rgba(0,0,0,.25)"; g.lineWidth = 2; g.stroke();
+  g.fillStyle = "#22224a";
+  for (const ex of [-10, 10]) { g.beginPath(); g.arc(ex, -3, 4, 0, 7); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.arc(ex - 1.6, -4.6, 1.5, 0, 7); g.fill(); g.fillStyle = "#22224a"; }
+  g.restore();
 }
 function showMenu() {
   phase = 0;
   $("win").classList.add("hidden");
   $("uname").textContent = user ? user.name : "Invité";
-  const av = $("avatar");
-  av.innerHTML = "";
-  if (user && user.picture) {
-    const img = document.createElement("img");
-    img.referrerPolicy = "no-referrer"; img.src = user.picture; img.alt = "";
-    av.appendChild(img);
-  } else {
-    av.textContent = (user ? user.name : "I")[0].toUpperCase();
-  }
-  $("snd").textContent = Snd.on ? "🔊" : "🔇";
-  $("logout").textContent = user ? "Quitter" : "Connexion";
+  fillAvatar($("avatar"));
+  $("snd").textContent = Snd.on ? "🔊 Son : activé" : "🔇 Son : coupé";
+  $("logout").textContent = user ? "Quitter / changer de compte" : "Se connecter";
   paintCloud();
   buildMenu();
   show("menu");
   const n = $("worlds").querySelector(".tile.now");
   if (n) setTimeout(() => n.scrollIntoView({ block: "center", behavior: "smooth" }), 450);
+}
+function showSettings() {
+  $("uname").textContent = user ? user.name : "Invité";
+  fillAvatar($("avatar"));
+  $("ustarsS").textContent = "";
+  $("snd").textContent = Snd.on ? "🔊 Son : activé" : "🔇 Son : coupé";
+  $("logout").textContent = user ? "Quitter / changer de compte" : "Se connecter";
+  paintCloud();
+  show("settings");
 }
 function buildMenu() {
   const p = getProg();
@@ -1884,7 +2152,8 @@ function drawBall() {
   ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = .28; ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(0, 0, R + 5, 0, 7); ctx.fill(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
   if ((ball.sq || 0) > .02) { ctx.rotate(ball.sqa); ctx.scale(1 - ball.sq, 1 + ball.sq * .9); ctx.rotate(-ball.sqa); }
   else if (sp > 220) { const a = Math.atan2(ball.vy, ball.vx), st = Math.min(.2, sp / 3600); ctx.rotate(a); ctx.scale(1 + st, 1 - st * .8); ctx.rotate(-a); }
-  const bg = ctx.createRadialGradient(-3, -4, 1, 0, 0, R + 1); bg.addColorStop(0, "#ffffff"); bg.addColorStop(1, "#c9d2ff");
+  const sk = Skins.current();
+  const bg = ctx.createRadialGradient(-3, -4, 1, 0, 0, R + 1); bg.addColorStop(0, sk.c1); bg.addColorStop(1, sk.c2);
   ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
   ctx.strokeStyle = "rgba(30,30,90,.35)"; ctx.lineWidth = 1.4; ctx.stroke();
   // yeux
@@ -1914,12 +2183,18 @@ function toast(msg, ok) {
 }
 
 /* ---------- Démarrage ---------- */
-$("guest").onclick = () => { user = null; store.del("tr_user"); Snd.pop(); showMenu(); };
+$("guest").onclick = () => { user = null; store.del("tr_user"); Snd.pop(); showHome(); };
 $("logout").onclick = () => { logout(); initGoogle(); };
+$("navCampagne").onclick = () => { Snd.pop(); showMenu(); };
+$("navShop").onclick = () => { Snd.pop(); openShop(); };
+$("navSettings").onclick = () => { Snd.pop(); showSettings(); };
+$("settingsBtn").onclick = () => { Snd.pop(); showSettings(); };
+$("navDuel").onclick = () => { Snd.pop(); show("duel"); };
+for (const id of ["backHome1","backHome2","backHome3","backHome4"]) $(id).onclick = () => { Snd.pop(); showHome(); };
 $("privacy").onclick = () => window.open(CFG.PRIVACY_URL, "_blank");
 $("adprefs").onclick = () => { try { Plug("AdMob").showPrivacyOptionsForm(); } catch (e) {} };
 user = store.get("tr_user");
-if (user) { showMenu(); Cloud.resume(); } else { show("login"); initGoogle(); }
+if (user) { showHome(); Cloud.resume(); } else { show("login"); initGoogle(); }
 Ads.init();
 if (CFG.ADS.enabled !== true) $("bonus").classList.add("hidden");
 </script>
