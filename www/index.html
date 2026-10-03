@@ -151,10 +151,37 @@
   .srow .who small { display: block; font-size: 11px; color: var(--muted); }
   .setbtn { text-align: left; padding: 15px; font-size: 15px; background: rgba(255,255,255,.07); }
 
-  /* ---------- 1v1 placeholder ---------- */
+  /* ---------- Pseudo ---------- */
+  #pseudo { background: radial-gradient(120% 70% at 50% 0%, #2a2170 0%, #151038 55%, #0d0a24 100%); }
+  .pseudoBox { flex: 1; display: flex; flex-direction: column; gap: 14px; justify-content: center; max-width: 320px; margin: 0 auto; width: 100%; }
+  .pseudoBox p { text-align: center; }
+  #pseudoInput { font: inherit; font-size: 20px; font-weight: 800; text-align: center; padding: 16px; border-radius: 16px; border: 2px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; }
+  #pseudoInput:focus { outline: none; border-color: var(--ink); }
+
+  /* ---------- Classement ---------- */
+  #leaderboard { background: radial-gradient(120% 70% at 50% 0%, #2a2170 0%, #151038 55%, #0d0a24 100%); }
+  .rowtabs { display: flex; gap: 8px; margin: 14px 0 10px; }
+  .lbListWrap { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; }
+  .lbLoading { text-align: center; color: var(--muted); margin-top: 30px; }
+  .lbRow { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255,255,255,.06); border-radius: 14px; }
+  .lbRow.mine { background: rgba(6,214,160,.18); border: 1px solid rgba(6,214,160,.5); }
+  .lbRank { font-weight: 900; color: var(--muted); text-align: center; }
+  .lbName { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lbVal { font-weight: 900; color: var(--ink); }
+  .lbSep { text-align: center; color: var(--muted); }
+
+  /* ---------- 1v1 ---------- */
   #duel { background: radial-gradient(120% 70% at 50% 0%, #4a1030 0%, #1b0a18 55%, #0d0a24 100%); }
-  .comingSoon { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 0 20px; }
-  .comingSoon h2 { font-size: 22px; } .comingSoon p { color: var(--muted); }
+  .duelPane { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 0 20px; width: 100%; }
+  .eloCard { display: flex; gap: 20px; background: rgba(255,255,255,.08); padding: 16px 24px; border-radius: 20px; margin-bottom: 10px; }
+  .eloCard small { display: block; color: var(--muted); font-size: 12px; } .eloCard b { font-size: 20px; }
+  #duelFind { width: 100%; max-width: 300px; padding: 16px; font-size: 17px; }
+  #duelLbBtn, #duelPseudoBtn { width: 100%; max-width: 300px; background: rgba(255,255,255,.08); }
+  .duelHint { color: var(--muted); font-size: 13px; max-width: 280px; margin-top: 10px; }
+  .spinner { width: 48px; height: 48px; border-radius: 50%; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--ink); animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #duelCountdown { font-size: 70px; font-weight: 900; color: var(--ink); }
+  #duelResultSub { color: var(--muted); }
 
   /* ---------- Jeu ---------- */
   #game { padding-left: 12px; padding-right: 12px; gap: 9px; background: linear-gradient(180deg, var(--top, #12324a), var(--bot, #1f6f6b)); }
@@ -275,17 +302,68 @@
   </div>
 </section>
 
-<!-- 1v1 (bientôt disponible en phase 2) -->
+<!-- CHOIX DU PSEUDO -->
+<section id="pseudo" class="screen hidden">
+  <div class="topbar">
+    <button id="backHomePseudo" class="icon-btn" aria-label="Annuler">‹</button>
+    <div class="who" style="text-align:center;flex:1"><b>Choisis ton pseudo</b></div>
+    <span style="width:44px"></span>
+  </div>
+  <div class="pseudoBox">
+    <p>Affiché dans le classement et pendant les duels. 3 à 16 caractères.</p>
+    <input id="pseudoInput" maxlength="16" placeholder="TonPseudo" autocomplete="off" />
+    <p id="pseudoErr" class="hidden" style="color:#ff4d78">Entre 3 et 16 caractères.</p>
+    <button id="pseudoOk" class="primary">Valider</button>
+  </div>
+</section>
+
+<!-- CLASSEMENT -->
+<section id="leaderboard" class="screen hidden">
+  <div class="topbar">
+    <button id="backLb" class="icon-btn" aria-label="Retour">‹</button>
+    <div class="who" style="text-align:center;flex:1"><b>Classement</b></div>
+    <span style="width:44px"></span>
+  </div>
+  <div id="lbTabs" class="rowtabs"></div>
+  <div id="lbList" class="lbListWrap"></div>
+</section>
+
+<!-- 1v1 -->
 <section id="duel" class="screen hidden">
   <div class="topbar">
     <button id="backHome4" class="icon-btn" aria-label="Accueil">‹</button>
     <div class="who" style="text-align:center;flex:1"><b>1 vs 1</b></div>
     <span style="width:44px"></span>
   </div>
-  <div class="comingSoon">
-    <div style="font-size:60px">⚔️</div>
-    <h2>Bientôt disponible</h2>
-    <p>Le mode duel en direct arrive dans une prochaine mise à jour.</p>
+
+  <div id="duelHome" class="duelPane">
+    <div class="eloCard">
+      <div><small>Ton pseudo</small><b id="duelPseudo">—</b></div>
+      <div><small>Ta côte</small><b id="duelElo">1000</b></div>
+    </div>
+    <button id="duelFind" class="primary pulse">⚔️ Chercher un adversaire</button>
+    <button id="duelLbBtn">🏆 Voir le classement</button>
+    <button id="duelPseudoBtn">✏️ Changer de pseudo</button>
+    <p class="duelHint">Même niveau pour les deux joueurs, celui qui le termine le plus vite gagne la côte et des pièces.</p>
+  </div>
+
+  <div id="duelSearch" class="duelPane hidden">
+    <div class="spinner"></div>
+    <p>Recherche d'un adversaire…</p>
+    <button id="duelCancel" class="ghost">Annuler</button>
+  </div>
+
+  <div id="duelFound" class="duelPane hidden">
+    <p>Adversaire trouvé !</p>
+    <h2 id="duelVs">Toi vs ???</h2>
+    <div id="duelCountdown">3</div>
+  </div>
+
+  <div id="duelResult" class="duelPane hidden">
+    <div id="duelResultBadge" style="font-size:54px">🏆</div>
+    <h2 id="duelResultTitle">Victoire !</h2>
+    <p id="duelResultSub"></p>
+    <button id="duelResultOk" class="primary">Retour</button>
   </div>
 </section>
 
@@ -1206,6 +1284,7 @@ function setStars(i, s) {
     const gained = (s - prev) * 10 + (prev === 0 ? 5 : 0);   // +10 par étoile gagnée, +5 bonus de première victoire
     if (gained > 0) Coins.add(gained, "niveau");
     Cloud.push();
+    if (Profile.hasPseudo()) Profile.publish();
   }
 }
 function setSkipped(i) {
@@ -1268,6 +1347,107 @@ const Cloud = {
     return a.token;
   },
   url() { return "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(this.cfg().projectId) + "/databases/(default)/documents/users/" + encodeURIComponent(this.auth.uid); },
+  base() { return "https://firestore.googleapis.com/v1/projects/" + encodeURIComponent(this.cfg().projectId) + "/databases/(default)/documents"; },
+  /* ---- Accès Firestore génériques (classement, file d'attente, duels) ---- */
+  fval(v) {
+    if (v == null) return { nullValue: null };
+    if (typeof v === "string") return { stringValue: v };
+    if (typeof v === "boolean") return { booleanValue: v };
+    if (typeof v === "number") return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (Array.isArray(v)) return { arrayValue: { values: v.map(x => this.fval(x)) } };
+    if (typeof v === "object") return { mapValue: { fields: Object.fromEntries(Object.entries(v).map(([k, x]) => [k, this.fval(x)])) } };
+    return { stringValue: String(v) };
+  },
+  jval(f) {
+    if (!f) return null;
+    if ("stringValue" in f) return f.stringValue;
+    if ("integerValue" in f) return parseInt(f.integerValue, 10);
+    if ("doubleValue" in f) return f.doubleValue;
+    if ("booleanValue" in f) return f.booleanValue;
+    if ("nullValue" in f) return null;
+    if ("arrayValue" in f) return (f.arrayValue.values || []).map(v => this.jval(v));
+    if ("mapValue" in f) return Object.fromEntries(Object.entries(f.mapValue.fields || {}).map(([k, v]) => [k, this.jval(v)]));
+    return null;
+  },
+  docFields(obj) { return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, this.fval(v)])); },
+  docToObj(doc) { return Object.fromEntries(Object.entries(doc.fields || {}).map(([k, v]) => [k, this.jval(v)])); },
+  async getDoc(path) {
+    const t = await this.token();
+    const r = await fetch(this.base() + "/" + path, { headers: { Authorization: "Bearer " + t } });
+    if (r.status === 404) return null;
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((j.error && j.error.message) || ("HTTP " + r.status));
+    return this.docToObj(j);
+  },
+  /* set complet du document (remplace tout) ; existsPrecondition: true|false|undefined */
+  async setDoc(path, obj, existsPrecondition) {
+    const t = await this.token();
+    let url = this.base() + "/" + path;
+    const r = await fetch(url, {
+      method: "PATCH", headers: { Authorization: "Bearer " + t, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: this.docFields(obj), ...(existsPrecondition !== undefined ? { currentDocument: { exists: existsPrecondition } } : {}) })
+    });
+    if (r.status === 400 || r.status === 409) return false;  // précondition non remplie
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((j.error && j.error.message) || ("HTTP " + r.status));
+    return true;
+  },
+  /* suppression conditionnelle : renvoie true si le document a bien été supprimé (et existait) */
+  async delDoc(path, mustExist) {
+    const t = await this.token();
+    let url = this.base() + "/" + path;
+    if (mustExist) url += "?currentDocument.exists=true";
+    const r = await fetch(url, { method: "DELETE", headers: { Authorization: "Bearer " + t } });
+    return r.ok;
+  },
+  /* mise à jour partielle (ne touche pas aux autres champs), dotPaths ex: ["times.abc123"] */
+  async patchDoc(path, obj, dotPaths) {
+    const t = await this.token();
+    const mask = dotPaths.map(p => "updateMask.fieldPaths=" + encodeURIComponent(p)).join("&");
+    const r = await fetch(this.base() + "/" + path + "?" + mask, {
+      method: "PATCH", headers: { Authorization: "Bearer " + t, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: this.docFields(obj) })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((j.error && j.error.message) || ("HTTP " + r.status));
+    return this.docToObj(j);
+  },
+  async queryWhere(collection, field, op, value, limit) {
+    const t = await this.token();
+    const body = { structuredQuery: {
+      from: [{ collectionId: collection }],
+      where: { fieldFilter: { field: { fieldPath: field }, op, value: this.fval(value) } },
+      limit: limit || 10
+    } };
+    const r = await fetch(this.base() + ":runQuery", {
+      method: "POST", headers: { Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    const j = await r.json().catch(() => ([]));
+    if (!r.ok) return [];
+    return j.filter(x => x.document).map(x => ({ id: x.document.name.split("/").pop(), ...this.docToObj(x.document) }));
+  },
+  async listDocs(collection) {
+    const t = await this.token();
+    const r = await fetch(this.base() + "/" + collection, { headers: { Authorization: "Bearer " + t } });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return [];
+    return (j.documents || []).map(d => ({ id: d.name.split("/").pop(), ...this.docToObj(d) }));
+  },
+  /* requête triée simple sur une collection top-level */
+  async query(collection, orderByField, limit) {
+    const t = await this.token();
+    const body = { structuredQuery: {
+      from: [{ collectionId: collection }],
+      orderBy: [{ field: { fieldPath: orderByField }, direction: "DESCENDING" }],
+      limit: limit || 50
+    } };
+    const r = await fetch(this.base() + ":runQuery", {
+      method: "POST", headers: { Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    const j = await r.json().catch(() => ([]));
+    if (!r.ok) return [];
+    return j.filter(x => x.document).map(x => ({ id: x.document.name.split("/").pop(), ...this.docToObj(x.document) }));
+  },
   async load() {
     const t = await this.token();
     const r = await fetch(this.url(), { headers: { Authorization: "Bearer " + t } });
@@ -1315,6 +1495,7 @@ const Cloud = {
         this.setStatus("ok");
         if (before !== JSON.stringify(merged) && !$("menu").classList.contains("hidden")) buildMenu();
         if (typeof refreshCoinUI === "function") refreshCoinUI();
+        if (typeof Profile !== "undefined") await Profile.restore();
       } catch (e) {
         console.warn("Cloud sync", e);
         this.setStatus(e.message === "session-expired" ? "relog" : "err", e.message);
@@ -1385,13 +1566,264 @@ const Skins = {
   selected() { return store.get(selSkinKey()) || "classic"; },
   select(id) { store.set(selSkinKey(), id); },
   current() { return SKINS.find(s => s.id === this.selected()) || SKINS[0]; },
-  buy(sk) {
-    if (sk.premium) { toast("Objet exclusif : bientôt disponible"); return; }
+  async buy(sk) {
+    if (sk.premium) { await IAP.purchase(sk); return; }
     if (this.has(sk.id)) return;
     if (!Coins.spend(sk.price)) { toast("Pas assez de pièces"); return; }
     this.own(sk.id); toast("Skin débloqué !", true); Snd.win();
   }
 };
+
+/* ---------- Achats réels (Google Play Billing) ---------- */
+const IAP = {
+  ready: false,
+  plug() { return Plug("NativePurchases"); },
+  async init() {
+    if (!Native || !this.plug()) return;
+    try {
+      const r = await this.plug().isBillingSupported();
+      this.ready = !!r.isBillingSupported;
+      if (this.ready) await this.restore();
+    } catch (e) { console.warn("IAP init", e); }
+  },
+  async purchase(sk) {
+    if (!Native || !this.plug()) { toast("Les achats ne sont disponibles que dans l'appli installée"); return; }
+    if (!this.ready) { toast("Boutique indisponible, réessaie dans un instant"); return; }
+    try {
+      const res = await this.plug().purchaseProduct({ productIdentifier: sk.productId, productType: "inapp", isConsumable: false });
+      if (res && res.transactionId) {
+        Skins.own(sk.id); toast(sk.name + " débloqué, merci !", true); Snd.win(); renderShop();
+      }
+    } catch (e) {
+      console.warn("purchase", e);
+      if (!/cancel/i.test(e.message || "")) toast("Achat impossible pour l'instant");
+    }
+  },
+  /* à relancer au démarrage : redonne les objets déjà achetés (réinstallation, nouvel appareil).
+     restorePurchases() ne renvoie rien directement : elle redéclenche un évènement par achat retrouvé. */
+  async restore() {
+    if (!Native || !this.plug()) return;
+    const found = [];
+    let handle = null;
+    try {
+      handle = await this.plug().addListener("transactionUpdated", t => { if (t && t.productIdentifier) found.push(t.productIdentifier); });
+      await this.plug().restorePurchases();
+      await new Promise(r => setTimeout(r, 1200));   // laisser le temps aux évènements d'arriver
+      const owned = SKINS.filter(s => s.premium && found.includes(s.productId)).map(s => s.id);
+      if (owned.length) { Skins.setOwned(Array.from(new Set([...Skins.owned(), ...owned]))); Cloud.push(); }
+    } catch (e) { console.warn("IAP restore", e); }
+    finally { try { handle && handle.remove(); } catch (e) {} }
+  }
+};
+
+/* ---------- Profil public (pseudo, classement, côte 1v1) ---------- */
+const Profile = {
+  pseudoKey() { return "tr_pseudo_" + (user ? user.id : "x"); },
+  eloKey() { return "tr_elo_" + (user ? user.id : "x"); },
+  pseudo() { return store.get(this.pseudoKey()) || ""; },
+  hasPseudo() { return !!this.pseudo(); },
+  setPseudo(p) { store.set(this.pseudoKey(), p); },
+  elo() { const v = store.get(this.eloKey()); return typeof v === "number" ? v : 1000; },
+  setElo(v) { store.set(this.eloKey(), v); },
+  statsNow() {
+    const p = getProg();
+    const levels = p.filter(x => x !== 0).length;
+    const stars = p.reduce((a, b) => a + Math.max(0, b), 0);
+    return { levels, stars };
+  },
+  /* publie le profil public (lisible par tout joueur connecté, pour le classement) */
+  async publish() {
+    if (!Cloud.enabled() || !Cloud.auth || !user || !this.hasPseudo()) return;
+    const { levels, stars } = this.statsNow();
+    try { await Cloud.setDoc("leaderboard/" + Cloud.auth.uid, { pseudo: this.pseudo(), levels, stars, elo: this.elo(), updated: Date.now() }); }
+    catch (e) { console.warn("publish leaderboard", e); }
+  },
+  /* au retour sur l'appli : si l'appareil n'a plus le pseudo/la côte en local (réinstallation), on les récupère */
+  async restore() {
+    if (!Cloud.enabled() || !Cloud.auth) return;
+    if (this.hasPseudo()) return;
+    try {
+      const d = await Cloud.getDoc("leaderboard/" + Cloud.auth.uid);
+      if (d && d.pseudo) { this.setPseudo(d.pseudo); if (typeof d.elo === "number") this.setElo(d.elo); }
+    } catch (e) {}
+  }
+};
+
+/* ---------- Classement ---------- */
+const LB_TABS = [
+  { id: "elo",    label: "Côte 1v1",  field: "elo" },
+  { id: "stars",  label: "Étoiles",   field: "stars" },
+  { id: "levels", label: "Niveaux",   field: "levels" }
+];
+let lbTab = "elo";
+async function openLeaderboard() {
+  if (!user) { toast("Connecte-toi avec Google pour voir le classement"); return; }
+  if (!Profile.hasPseudo()) { askPseudo(() => openLeaderboard()); return; }
+  show("leaderboard");
+  renderLbTabs();
+  await loadLeaderboard();
+}
+function renderLbTabs() {
+  const row = $("lbTabs"); row.innerHTML = "";
+  for (const t of LB_TABS) {
+    const b = document.createElement("button");
+    b.className = "shoptab" + (lbTab === t.id ? " on" : "");
+    b.textContent = t.label;
+    b.onclick = () => { lbTab = t.id; Snd.pop(); renderLbTabs(); loadLeaderboard(); };
+    row.appendChild(b);
+  }
+}
+async function loadLeaderboard() {
+  const list = $("lbList");
+  list.innerHTML = '<p class="lbLoading">Chargement…</p>';
+  if (!Cloud.enabled() || !Cloud.auth) { list.innerHTML = '<p class="lbLoading">Classement indisponible hors ligne.</p>'; return; }
+  try {
+    const field = LB_TABS.find(t => t.id === lbTab).field;
+    const rows = await Cloud.query("leaderboard", field, 50);
+    list.innerHTML = "";
+    const myUid = Cloud.auth.uid;
+    let myRank = rows.findIndex(r => r.id === myUid);
+    rows.forEach((r, i) => list.appendChild(lbRow(i + 1, r, r.id === myUid)));
+    if (myRank === -1) {
+      const mine = await Cloud.getDoc("leaderboard/" + myUid);
+      if (mine) {
+        const sep = document.createElement("div"); sep.className = "lbSep"; sep.textContent = "⋯"; list.appendChild(sep);
+        list.appendChild(lbRow("?", { ...mine, id: myUid }, true));
+      }
+    }
+    if (!rows.length) list.innerHTML = '<p class="lbLoading">Personne au classement pour l\'instant. Sois le premier !</p>';
+  } catch (e) { list.innerHTML = '<p class="lbLoading">Impossible de charger le classement.</p>'; }
+}
+function lbRow(rank, r, mine) {
+  const row = document.createElement("div");
+  row.className = "lbRow" + (mine ? " mine" : "");
+  const val = lbTab === "elo" ? Math.round(r.elo || 1000) : lbTab === "stars" ? (r.stars || 0) : (r.levels || 0);
+  row.innerHTML = `<span class="lbRank">${rank}</span><span class="lbName">${(r.pseudo || "?").slice(0, 18)}</span><span class="lbVal">${val}</span>`;
+  return row;
+}
+
+/* ---------- Choix du pseudo ---------- */
+let pseudoCb = null;
+function askPseudo(cb) {
+  pseudoCb = cb || null;
+  $("pseudoInput").value = Profile.pseudo();
+  $("pseudoErr").classList.add("hidden");
+  show("pseudo");
+  setTimeout(() => $("pseudoInput").focus(), 200);
+}
+function validatePseudo(v) {
+  v = (v || "").trim();
+  return v.length >= 3 && v.length <= 16 ? v : null;
+}
+
+/* ---------- 1 vs 1 ---------- */
+const Duel = {
+  searching: false, matchId: null, opp: null, level: 0, myElo0: 1000, oppElo0: 1000,
+  startTS: 0, waiting: false, deadline: 0, pollT: null, waitDeadline: 0,
+
+  dayLevel() { return Math.floor(Date.now() / 86400000) % LEVELS.length; },
+
+  async open() {
+    $("duelPseudo").textContent = Profile.pseudo() || "—";
+    $("duelElo").textContent = Math.round(Profile.elo());
+    for (const id of ["duelHome", "duelSearch", "duelFound", "duelResult"]) $(id).classList.add("hidden");
+    $("duelHome").classList.remove("hidden");
+    show("duel");
+  },
+  async start() {
+    if (!user) { toast("Connecte-toi avec Google pour jouer en 1v1"); return; }
+    if (!Profile.hasPseudo()) { askPseudo(() => Duel.start()); return; }
+    if (!Cloud.enabled() || !Cloud.auth) { toast("Connexion au cloud indisponible"); return; }
+    this.searching = true; this.matchId = null;
+    $("duelHome").classList.add("hidden"); $("duelSearch").classList.remove("hidden");
+    try { await Cloud.setDoc("duel_queue/" + Cloud.auth.uid, { uid: Cloud.auth.uid, pseudo: Profile.pseudo(), elo: Profile.elo(), ts: Date.now() }); }
+    catch (e) { toast("Impossible de rejoindre la file"); this.cancel(); return; }
+    this.deadline = Date.now() + 45000;
+    this.poll();
+  },
+  async cancel() {
+    this.searching = false; clearTimeout(this.pollT);
+    try { if (Cloud.auth) await Cloud.delDoc("duel_queue/" + Cloud.auth.uid); } catch (e) {}
+    this.open();
+  },
+  async poll() {
+    if (!this.searching) return;
+    if (Date.now() > this.deadline) { toast("Aucun adversaire trouvé, réessaie plus tard"); this.cancel(); return; }
+    try {
+      const mine = await Cloud.queryWhere("duels", "players", "ARRAY_CONTAINS", Cloud.auth.uid, 1);
+      if (mine.length) { this.searching = false; return this.matched(mine[0]); }
+      const q = await Cloud.listDocs("duel_queue");
+      const others = q.filter(d => d.uid && d.uid !== Cloud.auth.uid).sort((a, b) => (a.ts || 0) - (b.ts || 0));
+      if (others.length) {
+        const cand = others[0];
+        const claimed = await Cloud.delDoc("duel_queue/" + cand.uid, true);
+        if (claimed) {
+          const mid = [Cloud.auth.uid, cand.uid].sort().join("_");
+          const matchObj = { players: [Cloud.auth.uid, cand.uid], pseudos: { [Cloud.auth.uid]: Profile.pseudo(), [cand.uid]: cand.pseudo || "Joueur" },
+            elos: { [Cloud.auth.uid]: Profile.elo(), [cand.uid]: cand.elo || 1000 }, level: this.dayLevel(), times: {}, created: Date.now() };
+          const ok = await Cloud.setDoc("duels/" + mid, matchObj, false);
+          try { await Cloud.delDoc("duel_queue/" + Cloud.auth.uid); } catch (e) {}
+          if (ok) { this.searching = false; return this.matched({ id: mid, ...matchObj }); }
+          const existing = await Cloud.getDoc("duels/" + mid);
+          if (existing) { this.searching = false; return this.matched({ id: mid, ...existing }); }
+        }
+      }
+    } catch (e) { console.warn("duel poll", e); }
+    this.pollT = setTimeout(() => this.poll(), 1500);
+  },
+  matched(doc) {
+    this.matchId = doc.id;
+    const oppUid = doc.players.find(p => p !== Cloud.auth.uid);
+    this.opp = { uid: oppUid, pseudo: (doc.pseudos && doc.pseudos[oppUid]) || "Joueur" };
+    this.myElo0 = (doc.elos && doc.elos[Cloud.auth.uid]) || Profile.elo();
+    this.oppElo0 = (doc.elos && doc.elos[oppUid]) || 1000;
+    this.level = doc.level;
+    $("duelSearch").classList.add("hidden"); $("duelFound").classList.remove("hidden");
+    $("duelVs").textContent = (Profile.pseudo() || "Toi") + " vs " + this.opp.pseudo;
+    let n = 3; $("duelCountdown").textContent = n;
+    const t = setInterval(() => { n--; if (n <= 0) { clearInterval(t); this.launch(); } else $("duelCountdown").textContent = n; }, 700);
+  },
+  launch() {
+    $("duelFound").classList.add("hidden");
+    duelMode = { active: true };
+    startLevel(this.level);
+    this.startTS = performance.now();
+  },
+  async onWin() {
+    const elapsed = Math.round((performance.now() - this.startTS)) / 1000;
+    duelMode = null;
+    try { await Cloud.patchDoc("duels/" + this.matchId, { times: { [Cloud.auth.uid]: elapsed } }, ["times." + Cloud.auth.uid]); } catch (e) {}
+    $("duelFound").classList.add("hidden"); $("duelResult").classList.remove("hidden");
+    $("duelResultBadge").textContent = "⏱️"; $("duelResultTitle").textContent = "Terminé en " + elapsed.toFixed(1) + " s";
+    $("duelResultSub").textContent = "En attente de " + this.opp.pseudo + "…";
+    show("duel");
+    this.waiting = true; this.waitDeadline = Date.now() + 60000;
+    this.waitOpp(elapsed);
+  },
+  async waitOpp(myTime) {
+    if (!this.waiting) return;
+    if (Date.now() > this.waitDeadline) { this.resolve(myTime, null); return; }
+    try {
+      const d = await Cloud.getDoc("duels/" + this.matchId);
+      const oppT = d && d.times && d.times[this.opp.uid];
+      if (typeof oppT === "number") return this.resolve(myTime, oppT);
+    } catch (e) {}
+    setTimeout(() => this.waitOpp(myTime), 1500);
+  },
+  resolve(myTime, oppTime) {
+    this.waiting = false;
+    const won = oppTime == null || myTime < oppTime;
+    const expected = 1 / (1 + Math.pow(10, (this.oppElo0 - this.myElo0) / 400));
+    const newElo = Math.round(this.myElo0 + 32 * ((won ? 1 : 0) - expected));
+    Profile.setElo(newElo); Profile.publish();
+    Coins.add(won ? 40 : 15, "duel");
+    $("duelResultBadge").textContent = won ? "🏆" : "😔";
+    $("duelResultTitle").textContent = won ? "Victoire !" : "Défaite";
+    $("duelResultSub").textContent = (oppTime != null ? "Toi : " + myTime.toFixed(1) + "s · " + this.opp.pseudo + " : " + oppTime.toFixed(1) + "s · " : "Pas de réponse de l'adversaire · ") +
+      "Côte : " + this.myElo0 + " → " + newElo;
+  }
+};
+let duelMode = null;
 
 /* ---------- Boutique ---------- */
 let shopTab = "coins";
@@ -1592,7 +2024,7 @@ const Ads = {
 
 /* ---------- Navigation ---------- */
 function show(id) {
-  for (const s of ["login", "home", "menu", "shop", "settings", "duel", "game"]) $(s).classList.toggle("hidden", s !== id);
+  for (const s of ["login", "home", "menu", "shop", "settings", "duel", "pseudo", "leaderboard", "game"]) $(s).classList.toggle("hidden", s !== id);
   gameOn = id === "game";
   if (gameOn && !framing) { framing = true; lastT = performance.now(); requestAnimationFrame(frame); }
 }
@@ -1732,9 +2164,12 @@ function startLevel(i) {
   bumpAnim = (L.bumpers || []).map(() => 0);
   initFx(w);
   const t = $("ltitle");
-  t.innerHTML = "<b>Niveau " + (i + 1) + "</b><span>" + w.icon + " " + w.name + "</span>";
+  if (duelMode && duelMode.active) t.innerHTML = "<b>⚔️ Duel</b><span>contre " + (Duel.opp ? Duel.opp.pseudo : "?") + "</span>";
+  else t.innerHTML = "<b>Niveau " + (i + 1) + "</b><span>" + w.icon + " " + w.name + "</span>";
   t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop");
-  $("hint").classList.toggle("hidden", i > 1);
+  $("hint").classList.toggle("hidden", i > 1 || !!(duelMode && duelMode.active));
+  $("skipRow").classList.add("hidden");
+  $("bonus").classList.toggle("hidden", !!(duelMode && duelMode.active) || CFG.ADS.enabled !== true);
   $("win").classList.add("hidden");
   show("game");
   fit(); resetBall(); updateInk();
@@ -1932,7 +2367,7 @@ function update(dt) {
     phaseT += dt;
     if (phaseT > .85) {
       resetBall(); toast("Raté ! Essaie un autre tracé");
-      if (fails >= 6) $("skipRow").classList.remove("hidden");
+      if (fails >= 6 && !(duelMode && duelMode.active)) $("skipRow").classList.remove("hidden");
     }
   }
   updParts(dt);
@@ -1955,6 +2390,7 @@ function showWin() {
   if (L.par) { const r = inkUsed / L.par; stars = r <= 1.7 ? 3 : r <= 2.6 ? 2 : 1; }
   else { const r = inkUsed / L.ink; stars = r < .4 ? 3 : r < .7 ? 2 : 1; }
   setStars(lvl, stars);
+  if (duelMode && duelMode.active) { Duel.onWin(); return; }
   const last = lvl >= LEVELS.length - 1;
   $("wbadge").textContent = ["", "👍", "👏", "🏆"][stars];
   $("wtitle").textContent = last ? "Tu as tout terminé !" : ["", "Réussi !", "Bien joué !", "Parfait !"][stars];
@@ -1994,7 +2430,7 @@ $("skip").onclick = async () => {
   setSkipped(lvl); Snd.pop();
   if (lvl >= LEVELS.length - 1) showMenu(); else startLevel(lvl + 1);
 };
-$("back").onclick = () => { Snd.pop(); showMenu(); };
+$("back").onclick = () => { Snd.pop(); if (duelMode && duelMode.active) { duelMode = null; Duel.open(); } else showMenu(); };
 $("wmenu").onclick = async () => { $("win").classList.add("hidden"); await Ads.interstitialIfDue(); showMenu(); };
 $("wretry").onclick = () => { Snd.pop(); startLevel(lvl); };
 $("wnext").onclick = async () => { $("win").classList.add("hidden"); await Ads.interstitialIfDue(); Snd.pop(); startLevel(lvl + 1); };
@@ -2189,13 +2625,29 @@ $("navCampagne").onclick = () => { Snd.pop(); showMenu(); };
 $("navShop").onclick = () => { Snd.pop(); openShop(); };
 $("navSettings").onclick = () => { Snd.pop(); showSettings(); };
 $("settingsBtn").onclick = () => { Snd.pop(); showSettings(); };
-$("navDuel").onclick = () => { Snd.pop(); show("duel"); };
+$("navDuel").onclick = () => { Snd.pop(); Duel.open(); };
+$("duelFind").onclick = () => { Snd.pop(); Duel.start(); };
+$("duelCancel").onclick = () => { Snd.pop(); Duel.cancel(); };
+$("duelLbBtn").onclick = () => { Snd.pop(); openLeaderboard(); };
+$("duelPseudoBtn").onclick = () => { Snd.pop(); askPseudo(() => Duel.open()); };
+$("duelResultOk").onclick = () => { Snd.pop(); showHome(); };
+$("backLb").onclick = () => { Snd.pop(); Duel.open(); };
+$("pseudoOk").onclick = () => {
+  const v = validatePseudo($("pseudoInput").value);
+  if (!v) { $("pseudoErr").classList.remove("hidden"); return; }
+  Profile.setPseudo(v); Profile.publish(); Snd.pop();
+  const cb = pseudoCb; pseudoCb = null;
+  if (cb) cb(); else showHome();
+};
+$("backHomePseudo").onclick = () => { Snd.pop(); pseudoCb = null; showHome(); };
+$("pseudoInput").addEventListener("keydown", e => { if (e.key === "Enter") $("pseudoOk").click(); });
 for (const id of ["backHome1","backHome2","backHome3","backHome4"]) $(id).onclick = () => { Snd.pop(); showHome(); };
 $("privacy").onclick = () => window.open(CFG.PRIVACY_URL, "_blank");
 $("adprefs").onclick = () => { try { Plug("AdMob").showPrivacyOptionsForm(); } catch (e) {} };
 user = store.get("tr_user");
 if (user) { showHome(); Cloud.resume(); } else { show("login"); initGoogle(); }
 Ads.init();
+IAP.init();
 if (CFG.ADS.enabled !== true) $("bonus").classList.add("hidden");
 </script>
 </body>
