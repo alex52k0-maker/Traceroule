@@ -11,7 +11,7 @@ window.CFG = {
   },
 
   // Adresse publique de ta politique de confidentialité (voir docs/privacy.html)
-  PRIVACY_URL: "https://alex52k0-maker.github.io/trace-et-roule/privacy.html",
+  PRIVACY_URL: "https://alex52k0-maker.github.io/traceroule/privacy.html",
 
   ADS: {
     enabled: true,
