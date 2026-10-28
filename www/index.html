@@ -123,6 +123,9 @@
     animation: tileIn .5s cubic-bezier(.3,1.5,.5,1) both; }
   .navcard:nth-child(2) { animation-delay: .06s; } .navcard:nth-child(3) { animation-delay: .12s; } .navcard:nth-child(4) { animation-delay: .18s; }
   .navcard .ni { font-size: 40px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.3)); }
+  .navWide { margin-top: 12px; width: 100%; padding: 16px; border-radius: 20px; display: flex; align-items: center; gap: 10px; font-size: 20px;
+    background: linear-gradient(135deg, #ffd166, #ff9f43); color: #3a2400; box-shadow: 0 8px 18px rgba(255,159,67,.3); text-align: left; }
+  .navWide b { font-size: 16px; } .navWide small { display: block; font-size: 12px; font-weight: 700; opacity: .75; }
   .navcard b { font-size: 18px; font-weight: 900; }
   .navcard small { font-size: 12px; color: rgba(255,255,255,.85); font-weight: 700; }
   .homeBallPreview { flex: 1; display: grid; place-items: center; min-height: 0; }
@@ -163,8 +166,13 @@
   .rowtabs { display: flex; gap: 8px; margin: 14px 0 10px; }
   .lbListWrap { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; }
   .lbLoading { text-align: center; color: var(--muted); margin-top: 30px; }
-  .lbRow { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255,255,255,.06); border-radius: 14px; }
+  .lbRow { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(255,255,255,.06); border-radius: 14px; }
   .lbRow.mine { background: rgba(6,214,160,.18); border: 1px solid rgba(6,214,160,.5); }
+  .lbName b { display: block; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lbName small { display: flex; gap: 8px; font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .lbStats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .lbStats .main { font-weight: 900; color: var(--ink); font-size: 15px; }
+  .lbStats .sub { font-size: 11px; color: var(--muted); }
   .lbRank { font-weight: 900; color: var(--muted); text-align: center; }
   .lbName { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .lbVal { font-weight: 900; color: var(--ink); }
@@ -258,6 +266,7 @@
     <button id="navShop" class="navcard" style="--c1:#ffb84d;--c2:#c17a2b"><span class="ni">🛍️</span><b>Boutique</b><small>Skins & objets</small></button>
     <button id="navSettings" class="navcard" style="--c1:#9d7bff;--c2:#5b3fc9"><span class="ni">⚙️</span><b>Paramètres</b><small>Compte & options</small></button>
   </div>
+  <button id="navClassement" class="navWide">🏆 <b>Classement</b><small>Tous les joueurs inscrits</small></button>
   <div class="homeBallPreview"><canvas id="prevCv" width="140" height="140"></canvas></div>
 </section>
 
@@ -1656,9 +1665,11 @@ const LB_TABS = [
   { id: "levels", label: "Niveaux",   field: "levels" }
 ];
 let lbTab = "elo";
-async function openLeaderboard() {
+let lbFrom = "home";
+async function openLeaderboard(from) {
+  if (from) lbFrom = from;
   if (!user) { toast("Connecte-toi avec Google pour voir le classement"); return; }
-  if (!Profile.hasPseudo()) { askPseudo(() => openLeaderboard()); return; }
+  if (!Profile.hasPseudo()) { askPseudo(() => openLeaderboard(from)); return; }
   show("leaderboard");
   renderLbTabs();
   await loadLeaderboard();
@@ -1697,8 +1708,13 @@ async function loadLeaderboard() {
 function lbRow(rank, r, mine) {
   const row = document.createElement("div");
   row.className = "lbRow" + (mine ? " mine" : "");
-  const val = lbTab === "elo" ? Math.round(r.elo || 1000) : lbTab === "stars" ? (r.stars || 0) : (r.levels || 0);
-  row.innerHTML = `<span class="lbRank">${rank}</span><span class="lbName">${(r.pseudo || "?").slice(0, 18)}</span><span class="lbVal">${val}</span>`;
+  const elo = Math.round(r.elo || 1000), stars = r.stars || 0, levels = r.levels || 0;
+  const mainVal = lbTab === "elo" ? elo : lbTab === "stars" ? stars : levels;
+  const mainLabel = lbTab === "elo" ? "🏅 " + mainVal : lbTab === "stars" ? "★ " + mainVal : "🗺️ " + mainVal + "/" + LEVELS.length;
+  row.innerHTML = `
+    <span class="lbRank">${rank}</span>
+    <span class="lbName"><b>${(r.pseudo || "?").slice(0, 18)}</b><small>🗺️ ${levels}/${LEVELS.length} · ★ ${stars} · 🏅 ${elo}</small></span>
+    <span class="lbStats"><span class="main">${mainLabel}</span></span>`;
   return row;
 }
 
@@ -2628,10 +2644,11 @@ $("settingsBtn").onclick = () => { Snd.pop(); showSettings(); };
 $("navDuel").onclick = () => { Snd.pop(); Duel.open(); };
 $("duelFind").onclick = () => { Snd.pop(); Duel.start(); };
 $("duelCancel").onclick = () => { Snd.pop(); Duel.cancel(); };
-$("duelLbBtn").onclick = () => { Snd.pop(); openLeaderboard(); };
+$("duelLbBtn").onclick = () => { Snd.pop(); openLeaderboard("duel"); };
+$("navClassement").onclick = () => { Snd.pop(); openLeaderboard("home"); };
 $("duelPseudoBtn").onclick = () => { Snd.pop(); askPseudo(() => Duel.open()); };
 $("duelResultOk").onclick = () => { Snd.pop(); showHome(); };
-$("backLb").onclick = () => { Snd.pop(); Duel.open(); };
+$("backLb").onclick = () => { Snd.pop(); if (lbFrom === "duel") Duel.open(); else showHome(); };
 $("pseudoOk").onclick = () => {
   const v = validatePseudo($("pseudoInput").value);
   if (!v) { $("pseudoErr").classList.remove("hidden"); return; }
