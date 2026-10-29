@@ -1,0 +1,97 @@
+rules_version = '2';
+
+// Trace & Roule : règles de sécurité Firestore.
+// Principe : chacun n'écrit que ses propres données, et chaque écriture est validée (champs autorisés, types, bornes).
+// Limite connue : la progression, les pièces et la côte restent calculées par l'appli ; ces règles bloquent les
+// valeurs absurdes (côte 99 999, 1 000 niveaux, pseudo piégé…) mais pas une triche « plausible » dans les bornes.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function intIn(v, lo, hi) { return v is int && v >= lo && v <= hi; }
+    function numIn(v, lo, hi) { return (v is int || v is float) && v >= lo && v <= hi; }
+    // même alphabet que dans le jeu (logic.js) : lettres, chiffres, espace, _ . -
+    function validPseudo(p) { return p is string && p.matches('^[\\p{L}\\p{N} _.\\-]{3,16}$'); }
+    // champ facultatif : absent, ou présent et valide
+    function optInt(d, k, lo, hi) { return !(k in d) || intIn(d[k], lo, hi); }
+    function optStr(d, k, maxLen) { return !(k in d) || (d[k] is string && d[k].size() <= maxLen); }
+    // les skins exclusifs ne viennent que de Google Play : interdits dans les données cloud
+    function noPremium(d) { return !('ownedSkins' in d) || !d.ownedSkins.matches('.*"(galaxy|pirate|cool|ninja|cowboy|diamond|astro|unicorn)".*'); }
+
+    // ---------- Sauvegarde privée de chaque joueur ----------
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['progress', 'name', 'updated', 'coinsEarned', 'coinsSpent', 'ownedSkins', 'meta'])
+        && optStr(request.resource.data, 'progress', 2000)
+        && optStr(request.resource.data, 'name', 100)
+        && optStr(request.resource.data, 'ownedSkins', 1000)
+        && optStr(request.resource.data, 'meta', 4000)
+        && optInt(request.resource.data, 'updated', 0, 9999999999999)
+        && optInt(request.resource.data, 'coinsEarned', 0, 10000000)
+        && optInt(request.resource.data, 'coinsSpent', 0, 10000000)
+        && noPremium(request.resource.data);
+    }
+
+    // ---------- Classement public ----------
+    match /leaderboard/{uid} {
+      allow read: if signedIn();
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['pseudo', 'levels', 'stars', 'elo', 'wins', 'duels', 'updated'])
+        && validPseudo(request.resource.data.pseudo)
+        && intIn(request.resource.data.levels, 0, 200)
+        && intIn(request.resource.data.stars, 0, 600)
+        && numIn(request.resource.data.elo, 0, 4000)
+        && optInt(request.resource.data, 'wins', 0, 1000000)
+        && optInt(request.resource.data, 'duels', 0, 1000000)
+        && (!('wins' in request.resource.data) || !('duels' in request.resource.data) || request.resource.data.wins <= request.resource.data.duels)
+        && optInt(request.resource.data, 'updated', 0, 9999999999999);
+    }
+
+    // ---------- File d'attente du 1 vs 1 ----------
+    match /duel_queue/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['uid', 'pseudo', 'elo', 'ts', 'sid', 'expireAt'])
+        && request.resource.data.uid == uid
+        && validPseudo(request.resource.data.pseudo)
+        && numIn(request.resource.data.elo, 0, 4000)
+        && request.resource.data.ts is int
+        && request.resource.data.sid is string && request.resource.data.sid.matches('^[0-9a-f]{24}$')
+        && request.resource.data.expireAt is timestamp;
+      // réserver un adversaire = retirer son entrée de la file (suppression conditionnelle côté appli)
+      allow delete: if signedIn();
+    }
+
+    // ---------- Duels ----------
+    match /duels/{matchId} {
+      // lecture d'un duel précis uniquement (aucune requête de liste) ; un duel inexistant renvoie « introuvable »
+      allow get: if signedIn() && (resource == null || request.auth.uid in resource.data.players);
+      allow list: if false;
+      // création : par l'un des deux joueurs, sous l'identifiant de recherche de l'adversaire, sans aucun temps
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['players', 'sids', 'pseudos', 'elos', 'level', 'times', 'created', 'expireAt'])
+        && request.resource.data.players is list && request.resource.data.players.size() == 2
+        && request.resource.data.players[0] == request.auth.uid
+        && request.resource.data.players[1] != request.auth.uid
+        && request.resource.data.sids is list && request.resource.data.sids.size() == 2
+        && matchId == request.resource.data.sids[1]
+        && request.resource.data.pseudos is map && validPseudo(request.resource.data.pseudos[request.auth.uid])
+        && request.resource.data.elos is map
+        && intIn(request.resource.data.level, 0, 199)
+        && request.resource.data.times is map && request.resource.data.times.size() == 0
+        && request.resource.data.created is int
+        && request.resource.data.expireAt is timestamp;
+      // mise à jour : chaque joueur écrit SON temps, une seule fois, et rien d'autre
+      allow update: if signedIn() && request.auth.uid in resource.data.players
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['times'])
+        && request.resource.data.times.diff(resource.data.times).affectedKeys().hasOnly([request.auth.uid])
+        && !(request.auth.uid in resource.data.times)
+        && numIn(request.resource.data.times[request.auth.uid], 0.1, 999);
+      allow delete: if false;
+    }
+  }
+}
