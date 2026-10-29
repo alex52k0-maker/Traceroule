@@ -3,18 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "description": "Trace & Roule - jeu Draw & Physics",
+  "engines": { "node": ">=22" },
   "scripts": {
     "android:add": "npx cap add android && node scripts/patch-android.js",
-    "sync": "npx cap sync android && node scripts/patch-android.js"
+    "sync": "npx cap sync android && node scripts/patch-android.js",
+    "test": "node tests/check-syntax.mjs && node --test \"tests/*.test.mjs\"",
+    "test:smoke": "node tests/smoke.mjs"
   },
   "dependencies": {
-    "@capacitor/android": "^8.5.2",
-    "@capacitor/core": "^8.5.2",
-    "@capacitor-community/admob": "^8.1.0",
-    "@capgo/capacitor-social-login": "^8.3.0",
-    "@capgo/native-purchases": "^8.0.0"
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capgo/capacitor-social-login": "8.5.17",
+    "@capgo/native-purchases": "8.9.6"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.2"
+    "@capacitor/cli": "8.5.3",
+    "playwright": "1.64.1"
   }
 }
