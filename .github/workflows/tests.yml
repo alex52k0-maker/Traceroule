@@ -1,0 +1,32 @@
+name: 0 - Tests
+
+# Lancé à chaque envoi sur GitHub, et automatiquement avant chaque compilation (workflows 2 et 3).
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installer les dépendances (versions exactes du package-lock.json)
+        run: npm ci --ignore-scripts
+
+      - name: Syntaxe et tests unitaires
+        run: npm test
+
+      - name: Installer le navigateur de test
+        run: npx playwright install --with-deps chromium
+
+      - name: Test de bout en bout (écrans, partie, duel, sécurité)
+        run: npm run test:smoke
